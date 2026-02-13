@@ -1,9 +1,9 @@
 import { TrackDetail } from "../types.js";
 
-const DEFAULT_API_URL = "https://app.vibecheck-qa.com";
+const API_URL = "https://app.vibecheck-qa.com";
 
 export function getApiUrl(): string {
-  return process.env.VIBECHECK_API_URL || DEFAULT_API_URL;
+  return API_URL;
 }
 
 export function extractTrackId(urlOrId: string): string {

@@ -125,28 +125,6 @@ Add to `.vscode/mcp.json`:
 }
 ```
 
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `VIBECHECK_API_URL` | Custom API base URL | `https://app.vibecheck-qa.com` |
-
-To use a custom API URL:
-
-```json
-{
-  "mcpServers": {
-    "vibecheck": {
-      "command": "npx",
-      "args": ["-y", "@vibecheck-mcp/mcp"],
-      "env": {
-        "VIBECHECK_API_URL": "https://your-instance.example.com"
-      }
-    }
-  }
-}
-```
-
 ## Development
 
 ```bash
