@@ -1,0 +1,14 @@
+# Smithery configuration file: https://smithery.ai/docs/build/project-config/smithery-yaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      VIBECHECK_API_URL:
+        type: string
+        description: Custom API base URL for VibeCheck instance
+        default: "https://app.vibecheck-qa.com"
+  commandFunction:
+    |-
+    (config) => ({ command: 'npx', args: ['-y', '@vibecheck-mcp/mcp'], env: { VIBECHECK_API_URL: config.VIBECHECK_API_URL || 'https://app.vibecheck-qa.com' } })
