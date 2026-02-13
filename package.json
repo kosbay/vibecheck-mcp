@@ -1,0 +1,56 @@
+{
+  "name": "@vibecheck/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for VibeCheck bug reports — gives AI assistants access to screen recordings, console logs, network requests, and more",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "vibecheck-mcp": "./bin/vibecheck-mcp"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5"
+  },
+  "keywords": [
+    "mcp",
+    "vibecheck",
+    "bug-reports",
+    "debugging",
+    "claude",
+    "cursor",
+    "windsurf",
+    "model-context-protocol",
+    "qa",
+    "testing"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AOrynbasar/vibecheck-mcp"
+  },
+  "homepage": "https://github.com/AOrynbasar/vibecheck-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/AOrynbasar/vibecheck-mcp/issues"
+  }
+}
