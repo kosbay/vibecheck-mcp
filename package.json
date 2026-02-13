@@ -1,5 +1,5 @@
 {
-  "name": "@vibecheck/mcp",
+  "name": "@vibecheck-mcp/mcp",
   "version": "0.1.0",
   "description": "MCP server for VibeCheck bug reports — gives AI assistants access to screen recordings, console logs, network requests, and more",
   "type": "module",
@@ -47,10 +47,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AOrynbasar/vibecheck-mcp"
+    "url": "https://github.com/kosbay/vibecheck-mcp"
   },
-  "homepage": "https://github.com/AOrynbasar/vibecheck-mcp#readme",
+  "homepage": "https://github.com/kosbay/vibecheck-mcp#readme",
   "bugs": {
-    "url": "https://github.com/AOrynbasar/vibecheck-mcp/issues"
+    "url": "https://github.com/kosbay/vibecheck-mcp/issues"
   }
 }

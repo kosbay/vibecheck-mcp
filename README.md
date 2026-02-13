@@ -1,4 +1,4 @@
-# @vibecheck/mcp
+# @vibecheck-mcp/mcp
 
 MCP server for [VibeCheck](https://vibecheck-qa.com) bug reports. Gives AI assistants direct access to screen recordings, console logs, network requests, user actions, and web vitals — right inside your editor.
 
@@ -62,7 +62,7 @@ For **screenshot** tracks, `get_track` and `analyze_track_errors` return the scr
 ### Claude Code
 
 ```bash
-claude mcp add vibecheck -- npx -y @vibecheck/mcp
+claude mcp add vibecheck -- npx -y @vibecheck-mcp/mcp
 ```
 
 ### Claude Desktop
@@ -74,7 +74,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "vibecheck": {
       "command": "npx",
-      "args": ["-y", "@vibecheck/mcp"]
+      "args": ["-y", "@vibecheck-mcp/mcp"]
     }
   }
 }
@@ -89,7 +89,7 @@ Add to `.cursor/mcp.json`:
   "mcpServers": {
     "vibecheck": {
       "command": "npx",
-      "args": ["-y", "@vibecheck/mcp"]
+      "args": ["-y", "@vibecheck-mcp/mcp"]
     }
   }
 }
@@ -104,7 +104,7 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
   "mcpServers": {
     "vibecheck": {
       "command": "npx",
-      "args": ["-y", "@vibecheck/mcp"]
+      "args": ["-y", "@vibecheck-mcp/mcp"]
     }
   }
 }
@@ -119,7 +119,7 @@ Add to `.vscode/mcp.json`:
   "servers": {
     "vibecheck": {
       "command": "npx",
-      "args": ["-y", "@vibecheck/mcp"]
+      "args": ["-y", "@vibecheck-mcp/mcp"]
     }
   }
 }
@@ -138,7 +138,7 @@ To use a custom API URL:
   "mcpServers": {
     "vibecheck": {
       "command": "npx",
-      "args": ["-y", "@vibecheck/mcp"],
+      "args": ["-y", "@vibecheck-mcp/mcp"],
       "env": {
         "VIBECHECK_API_URL": "https://your-instance.example.com"
       }
@@ -150,7 +150,7 @@ To use a custom API URL:
 ## Development
 
 ```bash
-git clone https://github.com/AOrynbasar/vibecheck-mcp.git
+git clone https://github.com/kosbay/vibecheck-mcp.git
 cd vibecheck-mcp
 npm install
 npm run build
