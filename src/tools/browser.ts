@@ -2,6 +2,7 @@ import { z } from "zod";
 import { rmSync } from "node:fs";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { BrowserSession, ElementTarget } from "../browser/session.js";
+import { condenseRecording } from "../browser/condense.js";
 import { preflightUploadCheck, uploadRecording } from "../api/upload.js";
 
 // One recorded browser session per MCP server process. Recording starts
@@ -276,7 +277,19 @@ export function registerBrowserTools(server: McpServer): void {
           return textResult("Session discarded. Nothing was uploaded.");
         }
 
-        const recording = await session.finish();
+        let recording = await session.finish();
+        let condensedNote = "";
+        try {
+          // Cut out idle "think time" between actions so the video is short
+          // and watchable; falls back to the full video when ffmpeg is missing
+          const condensed = await condenseRecording(recording);
+          if (condensed) {
+            condensedNote = ` (condensed from ${Math.round(recording.duration / 1000)}s — idle time between actions removed)`;
+            recording = condensed;
+          }
+        } catch {
+          // Condensing is best-effort — upload the original video instead
+        }
         try {
           const { trackUrl, trackId } = await uploadRecording(
             recording,
@@ -290,7 +303,7 @@ export function registerBrowserTools(server: McpServer): void {
               ``,
               `Shareable link: ${trackUrl}`,
               `Track ID: ${trackId}`,
-              `Duration: ${Math.round(recording.duration / 1000)}s`,
+              `Duration: ${Math.round(recording.duration / 1000)}s${condensedNote}`,
               `Console errors: ${recording.metadataStats.consoleErrors}, network errors: ${recording.metadataStats.networkErrors}, actions: ${recording.metadataStats.userActionsCount}`,
             ].join("\n")
           );

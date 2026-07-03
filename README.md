@@ -117,6 +117,13 @@ A browser window opens, and within ~15 seconds the agent replies with a `.../tra
 | `VIBECHECK_API_KEY` | For recording | Personal API key (`vck_...`) from the API Keys page |
 | `VIBECHECK_API_URL` | No | Override platform URL (default `https://app.vibecheck-qa.com`) |
 | `VIBECHECK_HEADLESS` | No | Set `1` to hide the browser window (CI) |
+| `VIBECHECK_NO_CONDENSE` | No | Set `1` to upload the full-length video instead of the condensed one |
+
+### Watchable videos
+
+Recordings show a **cursor that moves to every element** the agent interacts with, a **click ripple**, and a **caption** describing each action (`Click — Place order button`), so anyone watching the video can follow what happened.
+
+If `ffmpeg` is installed (`brew install ffmpeg` / `apt install ffmpeg`), the idle "agent think time" between actions is automatically cut out before upload — a 5-minute session typically becomes under a minute, with the console/network/action timeline re-synced to the shorter video. Without ffmpeg the full-length video is uploaded as-is.
 
 ## 🔍 Analyze bug reports
 

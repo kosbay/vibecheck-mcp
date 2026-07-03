@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { TrackRecorder } from "./recorder.js";
 import { launchBrowser } from "./launcher.js";
+import { OVERLAY_SCRIPT, CURSOR_GLIDE_MS } from "./overlay.js";
 
 const VIEWPORT = { width: 1280, height: 720 };
 const SNAPSHOT_MAX_CHARS = 30_000;
@@ -68,6 +69,8 @@ export class BrowserSession {
       viewport: VIEWPORT,
       recordVideo: { dir: this.videoDir, size: VIEWPORT },
     });
+    // Cursor + caption overlay so the video shows what the agent is doing
+    await this.context.addInitScript(OVERLAY_SCRIPT);
 
     // Video frame 0 corresponds to page creation — stamp startTs right before
     this.startTs = Date.now();
@@ -125,6 +128,78 @@ export class BrowserSession {
     );
   }
 
+  /** Show a caption in the overlay. Best-effort — never fails the action. */
+  private async showCaption(text: string): Promise<void> {
+    const page = this.page;
+    if (!page || page.isClosed()) return;
+    await page
+      .evaluate(
+        (t) =>
+          (
+            window as unknown as {
+              __vckOverlay?: { caption(t: string): void };
+            }
+          ).__vckOverlay?.caption(t),
+        text
+      )
+      .catch(() => {});
+  }
+
+  /**
+   * Glide the fake cursor to the target element (with caption), so the video
+   * shows what is about to be interacted with. Returns the target point.
+   * Best-effort — never fails the action.
+   */
+  private async animateToTarget(
+    locator: Locator,
+    caption: string,
+    ripple: boolean
+  ): Promise<void> {
+    const page = this.page;
+    if (!page || page.isClosed()) return;
+    try {
+      await locator.scrollIntoViewIfNeeded({ timeout: 5_000 }).catch(() => {});
+      const box = await locator.boundingBox({ timeout: 5_000 });
+      if (!box) {
+        await this.showCaption(caption);
+        return;
+      }
+      const x = Math.min(Math.max(box.x + box.width / 2, 0), VIEWPORT.width - 2);
+      const y = Math.min(Math.max(box.y + box.height / 2, 0), VIEWPORT.height - 2);
+      await page.evaluate(
+        (a) => {
+          const o = (
+            window as unknown as {
+              __vckOverlay?: {
+                caption(t: string): void;
+                moveTo(x: number, y: number): void;
+              };
+            }
+          ).__vckOverlay;
+          o?.caption(a.caption);
+          o?.moveTo(a.x, a.y);
+        },
+        { x, y, caption }
+      );
+      // Let the glide land on video frames before the real action fires
+      await page.waitForTimeout(CURSOR_GLIDE_MS + 120);
+      if (ripple) {
+        await page.evaluate(
+          (a) =>
+            (
+              window as unknown as {
+                __vckOverlay?: { ripple(x: number, y: number): void };
+              }
+            ).__vckOverlay?.ripple(a.x, a.y),
+          { x, y }
+        );
+        await page.waitForTimeout(180);
+      }
+    } catch {
+      // Overlay is cosmetic — the action itself proceeds regardless
+    }
+  }
+
   async snapshot(): Promise<string> {
     const page = this.requirePage();
     let text: string;
@@ -150,20 +225,30 @@ export class BrowserSession {
     const page = this.requirePage();
     this.recorder.recordAction("navigation", `Navigated to ${url}`);
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30_000 });
+    // Caption after load — a pre-navigation caption would die with the old document
+    await this.showCaption(`Navigate — ${url}`);
   }
 
   async click(target: ElementTarget): Promise<void> {
     const locator = this.resolveTarget(target);
     this.recorder.recordAction("click", target.element);
+    await this.animateToTarget(locator, `Click — ${target.element}`, true);
     await locator.click({ timeout: 10_000 });
   }
 
   async type(target: ElementTarget, text: string, submit = false): Promise<void> {
     const locator = this.resolveTarget(target);
     this.recorder.recordAction("input", target.element, `Typed "${text}"`);
+    const preview = text.length > 40 ? `${text.slice(0, 40)}…` : text;
+    await this.animateToTarget(
+      locator,
+      `Type "${preview}" — ${target.element}`,
+      false
+    );
     await locator.fill(text, { timeout: 10_000 });
     if (submit) {
       this.recorder.recordAction("keypress", target.element, "Pressed Enter");
+      await this.showCaption("Press Enter");
       await locator.press("Enter");
     }
   }
@@ -171,6 +256,7 @@ export class BrowserSession {
   async pressKey(key: string): Promise<void> {
     const page = this.requirePage();
     this.recorder.recordAction("keypress", `Pressed ${key}`);
+    await this.showCaption(`Press ${key}`);
     await page.keyboard.press(key);
   }
 
@@ -181,12 +267,18 @@ export class BrowserSession {
       target.element,
       `Selected ${values.join(", ")}`
     );
+    await this.animateToTarget(
+      locator,
+      `Select "${values.join(", ")}" — ${target.element}`,
+      true
+    );
     await locator.selectOption(values, { timeout: 10_000 });
   }
 
   async hover(target: ElementTarget): Promise<void> {
     const locator = this.resolveTarget(target);
     this.recorder.recordAction("hover", target.element);
+    await this.animateToTarget(locator, `Hover — ${target.element}`, false);
     await locator.hover({ timeout: 10_000 });
   }
 
@@ -195,13 +287,39 @@ export class BrowserSession {
     const pixels = amount ?? VIEWPORT.height * 0.8;
     const dy = direction === "down" ? pixels : -pixels;
     this.recorder.recordAction("scroll", `Scrolled ${direction}`);
+    await this.showCaption(`Scroll ${direction}`);
     await page.mouse.wheel(0, dy);
   }
 
   async screenshot(): Promise<{ data: string; mimeType: string }> {
     const page = this.requirePage();
-    const buffer = await page.screenshot({ type: "png" });
-    return { data: buffer.toString("base64"), mimeType: "image/png" };
+    // Keep agent screenshots clean — the overlay is for the video only
+    await this.setOverlayVisible(false);
+    try {
+      const buffer = await page.screenshot({ type: "png" });
+      return { data: buffer.toString("base64"), mimeType: "image/png" };
+    } finally {
+      await this.setOverlayVisible(true);
+    }
+  }
+
+  private async setOverlayVisible(visible: boolean): Promise<void> {
+    const page = this.page;
+    if (!page || page.isClosed()) return;
+    await page
+      .evaluate(
+        (v) => {
+          const o = (
+            window as unknown as {
+              __vckOverlay?: { show(): void; hide(): void };
+            }
+          ).__vckOverlay;
+          if (v) o?.show();
+          else o?.hide();
+        },
+        visible
+      )
+      .catch(() => {});
   }
 
   async waitFor(opts: {
