@@ -22,7 +22,7 @@ function buildContent(result: TrackToolResult) {
 export function createServer(): McpServer {
   const server = new McpServer({
     name: "vibecheck",
-    version: "0.1.0",
+    version: "0.2.0",
   });
 
   // Register get_track tool
