@@ -6,6 +6,7 @@ import {
   getTrackPerformance, getTrackPerformanceSchema,
   getTrackActions, getTrackActionsSchema,
 } from "./tools/index.js";
+import { registerBrowserTools } from "./tools/browser.js";
 import { TrackToolResult } from "./types.js";
 
 function buildContent(result: TrackToolResult) {
@@ -118,6 +119,9 @@ export function createServer(): McpServer {
       }
     }
   );
+
+  // Recorded browser session tools (navigate/click/type/... + finish→upload)
+  registerBrowserTools(server);
 
   return server;
 }

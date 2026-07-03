@@ -10,7 +10,8 @@
   },
   "files": [
     "dist",
-    "bin"
+    "bin",
+    "DOCS.md"
   ],
   "scripts": {
     "build": "tsc",
@@ -26,6 +27,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "playwright": "~1.55.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {

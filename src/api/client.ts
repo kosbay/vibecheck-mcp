@@ -1,10 +1,7 @@
 import { TrackDetail } from "../types.js";
 
-const API_URL = "https://app.vibecheck-qa.com";
-
-export function getApiUrl(): string {
-  return API_URL;
-}
+export { getApiUrl } from "../config.js";
+import { getApiUrl } from "../config.js";
 
 export function extractTrackId(urlOrId: string): string {
   // If it's just an ID, return it directly

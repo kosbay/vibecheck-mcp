@@ -2,7 +2,9 @@
 
 MCP server for [VibeCheck](https://vibecheck-qa.com) bug reports. Gives AI assistants direct access to screen recordings, console logs, network requests, user actions, and web vitals — right inside your editor.
 
-Just paste a VibeCheck track URL and your AI can analyze the bug report.
+Just paste a VibeCheck track URL and your AI can analyze the bug report. It can also **record its own browser sessions**: tell your AI "go to this page and validate this value" and it drives a local browser while VibeCheck records everything, returning a shareable track link as evidence.
+
+📖 **[Full guide — features, installation, use cases → DOCS.md](./DOCS.md)**
 
 ## Tools
 
