@@ -1,6 +1,6 @@
 {
   "name": "@vibecheck-mcp/mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MCP server for VibeCheck bug reports — gives AI assistants access to screen recordings, console logs, network requests, and more",
   "type": "module",
   "main": "dist/index.js",
