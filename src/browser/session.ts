@@ -1,8 +1,9 @@
-import { chromium, Browser, BrowserContext, Page, Locator } from "playwright";
+import { Browser, BrowserContext, Page, Locator } from "playwright";
 import { mkdtempSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { TrackRecorder } from "./recorder.js";
+import { launchBrowser } from "./launcher.js";
 
 const VIEWPORT = { width: 1280, height: 720 };
 const SNAPSHOT_MAX_CHARS = 30_000;
@@ -12,6 +13,7 @@ export interface FinishedRecording {
   videoDir: string;
   startTs: number;
   duration: number;
+  browserName: string;
   browserVersion: string;
   resolution: string;
   metadataJson: string;
@@ -41,6 +43,7 @@ export class BrowserSession {
   private videoDir: string | null = null;
   private startTs = 0;
   private dead = false;
+  private browserName = "Chromium";
   recorder = new TrackRecorder();
 
   get active(): boolean {
@@ -57,19 +60,9 @@ export class BrowserSession {
 
     this.recorder = new TrackRecorder();
     this.videoDir = mkdtempSync(join(tmpdir(), "vibecheck-mcp-"));
-    try {
-      this.browser = await chromium.launch({
-        headless: process.env.VIBECHECK_HEADLESS === "1",
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      if (/executable doesn't exist|browserType.launch/i.test(message)) {
-        throw new Error(
-          "Chromium is not installed for Playwright. Run: npx playwright install chromium"
-        );
-      }
-      throw error;
-    }
+    const launched = await launchBrowser(process.env.VIBECHECK_HEADLESS === "1");
+    this.browser = launched.browser;
+    this.browserName = launched.browserName;
 
     this.context = await this.browser.newContext({
       viewport: VIEWPORT,
@@ -255,6 +248,7 @@ export class BrowserSession {
       videoDir: this.videoDir || "",
       startTs: this.startTs,
       duration: endTs - this.startTs,
+      browserName: this.browserName,
       browserVersion,
       resolution: `${VIEWPORT.width}x${VIEWPORT.height}`,
       metadataJson: this.recorder.buildMetadataJson(),
@@ -291,5 +285,6 @@ export class BrowserSession {
     this.videoDir = null;
     this.startTs = 0;
     this.dead = false;
+    this.browserName = "Chromium";
   }
 }

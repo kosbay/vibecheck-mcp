@@ -23,7 +23,7 @@ The recording tools follow a "**the AI drives, VibeCheck records**" model:
 You (prompt): "Go to app.example.com/cart and check the total is $42"
       │
       ▼
-AI assistant ──── MCP tools ────▶ Local Chromium (Playwright, visible window)
+AI assistant ──── MCP tools ────▶ Local browser (your Chrome/Edge, visible window)
                                         │
                               VibeCheck records passively:
                               • video of the whole session
@@ -39,7 +39,7 @@ Upload to VibeCheck ──▶ shareable link: https://app.vibecheck-qa.com/track
 Key design points:
 
 - **No hidden AI loop.** The MCP server never calls an LLM. Your assistant does the reasoning and clicking; the server is a recorded browser plus an uploader. You pay nothing extra.
-- **Local browser.** Chromium runs on your machine, so it can reach `localhost` dev servers, staging behind VPN — anything you can reach.
+- **Local browser.** The browser runs on your machine, so it can reach `localhost` dev servers, staging behind VPN — anything you can reach. Your installed Google Chrome or Edge is used automatically (with a fresh, isolated profile); if neither exists, a Chromium build is downloaded on first run.
 - **Implicit session start.** The first `browser_navigate` launches the browser and starts recording. There is no separate "start" step.
 - **One session at a time.** A session ends with `browser_finish` (upload) or `browser_finish` with `discard: true` (throw away).
 - **Normal VibeCheck tracks.** The upload is a standard `type: "video"` track — it appears in your dashboard, works with the track viewer's Console/Network/Actions tabs, counts toward your plan's monthly recordings, and can be fed back into the read tools or AI Fix.
@@ -65,14 +65,13 @@ The AI passes a `ref` (e.g. `e6`) to `browser_click` / `browser_type` to target 
 ### Prerequisites
 
 - **Node.js ≥ 18**
-- **Playwright Chromium** (only needed for the recording tools):
-  ```bash
-  npx playwright install chromium
-  ```
+- **A browser** — nothing to install if you have Google Chrome or Microsoft Edge (auto-detected, run with a fresh isolated profile). Otherwise a Chromium build is auto-downloaded on first run; to pre-download it instead: `npx playwright install chromium`
 - **A VibeCheck personal API key** (only needed for the recording tools):
   1. Sign in at [app.vibecheck-qa.com](https://app.vibecheck-qa.com)
   2. Go to **Settings → API Keys**
   3. Click **Generate key** and copy the `vck_...` value (it is shown only once)
+
+The key-created dialog also gives you **ready-made setup**: a copy-paste Claude Code command with your key already inside, and one-click **Add to Cursor** / **Add to VS Code** buttons — use those and skip the manual configs below.
 
 The read tools work without any key or browser install.
 
@@ -215,7 +214,7 @@ Notes:
 
 | Symptom | Fix |
 |---------|-----|
-| `Chromium is not installed for Playwright` | Run `npx playwright install chromium` |
+| `Could not find or install a browser` | Install Google Chrome, or run `npx playwright install chromium` |
 | `VIBECHECK_API_KEY is not set` | Generate a key in **Settings → API Keys** and add it to your MCP config's `env` |
 | `VibeCheck rejected the API key (401)` | Key was revoked or mistyped — generate a new one |
 | `Monthly recording limit reached` | You hit your plan's recordings/month cap — upgrade or wait for the monthly reset |

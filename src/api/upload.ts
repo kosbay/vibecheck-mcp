@@ -102,7 +102,7 @@ export async function uploadRecording(
     vitals: [],
     locations: recording.locations,
     startTs: recording.startTs,
-    browserName: "Chromium",
+    browserName: recording.browserName,
     browserVersion: recording.browserVersion,
     platform: nodePlatformLabel(),
     resolution: recording.resolution,
