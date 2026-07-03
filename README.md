@@ -36,7 +36,7 @@ Perfect for: "go validate this page", reproducing a bug from an existing report,
 - **A browser** — nothing to install if you have Google Chrome or Microsoft Edge (auto-detected). Otherwise one is auto-downloaded on first run (or pre-download: `npx playwright install chromium`)
 - **A VibeCheck API key** (recording only — the read tools below need no key):
   1. Sign in at [app.vibecheck-qa.com](https://app.vibecheck-qa.com)
-  2. Open **Settings → API Keys** → **Generate key**
+  2. Open the **API Keys** page ([app.vibecheck-qa.com/api-keys](https://app.vibecheck-qa.com/api-keys)) → **Generate key**
   3. The dialog gives you a ready-made setup: a copy-paste Claude Code command with your key already inside, plus one-click **Add to Cursor** / **Add to VS Code** buttons — use those and skip the manual configs below
 
 ### Claude Code
@@ -65,7 +65,7 @@ Add to `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claud
 
 ### Cursor
 
-Add the same block to `.cursor/mcp.json` (or use the one-click **Add to Cursor** button in VibeCheck Settings):
+Add the same block to `.cursor/mcp.json` (or use the one-click **Add to Cursor** button on VibeCheck's API Keys page):
 
 ```json
 {
@@ -114,7 +114,7 @@ A browser window opens, and within ~15 seconds the agent replies with a `.../tra
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `VIBECHECK_API_KEY` | For recording | Personal API key (`vck_...`) from Settings → API Keys |
+| `VIBECHECK_API_KEY` | For recording | Personal API key (`vck_...`) from the API Keys page |
 | `VIBECHECK_API_URL` | No | Override platform URL (default `https://app.vibecheck-qa.com`) |
 | `VIBECHECK_HEADLESS` | No | Set `1` to hide the browser window (CI) |
 

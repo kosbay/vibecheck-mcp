@@ -68,7 +68,7 @@ The AI passes a `ref` (e.g. `e6`) to `browser_click` / `browser_type` to target 
 - **A browser** — nothing to install if you have Google Chrome or Microsoft Edge (auto-detected, run with a fresh isolated profile). Otherwise a Chromium build is auto-downloaded on first run; to pre-download it instead: `npx playwright install chromium`
 - **A VibeCheck personal API key** (only needed for the recording tools):
   1. Sign in at [app.vibecheck-qa.com](https://app.vibecheck-qa.com)
-  2. Go to **Settings → API Keys**
+  2. Go to the **API Keys** page ([app.vibecheck-qa.com/api-keys](https://app.vibecheck-qa.com/api-keys))
   3. Click **Generate key** and copy the `vck_...` value (it is shown only once)
 
 The key-created dialog also gives you **ready-made setup**: a copy-paste Claude Code command with your key already inside, and one-click **Add to Cursor** / **Add to VS Code** buttons — use those and skip the manual configs below.
@@ -123,7 +123,7 @@ Add to `.vscode/mcp.json`:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `VIBECHECK_API_KEY` | For recording only | Personal API key (`vck_...`) from Settings → API Keys. Uploads go to this account. |
+| `VIBECHECK_API_KEY` | For recording only | Personal API key (`vck_...`) from the API Keys page. Uploads go to this account. |
 | `VIBECHECK_API_URL` | No | Override the platform URL (default `https://app.vibecheck-qa.com`). Useful for self-hosted / local dev. |
 | `VIBECHECK_HEADLESS` | No | Set to `1` to run the recorded browser without a visible window (CI, servers). Default is headed so you can watch the AI work. |
 
@@ -215,7 +215,7 @@ Notes:
 | Symptom | Fix |
 |---------|-----|
 | `Could not find or install a browser` | Install Google Chrome, or run `npx playwright install chromium` |
-| `VIBECHECK_API_KEY is not set` | Generate a key in **Settings → API Keys** and add it to your MCP config's `env` |
+| `VIBECHECK_API_KEY is not set` | Generate a key at **app.vibecheck-qa.com/api-keys** and add it to your MCP config's `env` |
 | `VibeCheck rejected the API key (401)` | Key was revoked or mistyped — generate a new one |
 | `Monthly recording limit reached` | You hit your plan's recordings/month cap — upgrade or wait for the monthly reset |
 | Upload failed but I need the recording | The error message includes the local path of the saved `.webm` — it is not deleted |
@@ -226,6 +226,6 @@ Notes:
 
 ## Privacy & security
 
-- The plaintext API key is stored only in your MCP config; VibeCheck stores a SHA-256 hash. Revoke keys anytime in **Settings → API Keys**.
+- The plaintext API key is stored only in your MCP config; VibeCheck stores a SHA-256 hash. Revoke keys anytime on the **API Keys** page.
 - The browser session is a fresh, isolated profile — no cookies or logins from your daily browser leak into recordings.
 - All recorded data (video, logs, network) is uploaded only when you call `browser_finish` without `discard`. Until then, everything stays on your machine.

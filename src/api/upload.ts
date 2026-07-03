@@ -17,7 +17,7 @@ function requireApiKey(): string {
   if (!key) {
     throw new Error(
       "VIBECHECK_API_KEY is not set (or doesn't start with vck_). " +
-        "Generate a personal API key in VibeCheck Settings → API Keys and " +
+        "Generate a personal API key at app.vibecheck-qa.com/api-keys and " +
         "set it as the VIBECHECK_API_KEY environment variable."
     );
   }
@@ -37,7 +37,7 @@ async function callInit(): Promise<InitResponse> {
   const data = await resp.json().catch(() => ({}));
   if (resp.status === 401) {
     throw new Error(
-      "VibeCheck rejected the API key (401). Generate a new key in Settings → API Keys."
+      "VibeCheck rejected the API key (401). Generate a new key at app.vibecheck-qa.com/api-keys."
     );
   }
   if (resp.status === 429) {
